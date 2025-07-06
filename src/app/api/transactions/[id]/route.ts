@@ -1,6 +1,7 @@
 import { connectDB } from "@/lib/db";
 import Transaction from "@/models/Transaction";
-import { NextResponse } from "next/server";
+import { NextResponse,NextRequest } from "next/server";
+
 
 
 export async function DELETE(req: Request, { params }: { params: { id: string } }) {
@@ -14,20 +15,45 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
 
 }
 
-export async function PUT(req: Request,context: { params: { id: string } }) {
-  const { params } = context;
+
+interface RouteParams {
+  params: Promise<{ id: string }>;
+}
+
+
+export async function PUT(
+  req: NextRequest,
+  { params }: RouteParams
+) {
+  
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
+
+  if (!id) {
+    return NextResponse.json({ message: "Missing transaction ID" }, { status: 400 });
+  }
 
   try {
     await connectDB();
     const body = await req.json();
-        const { id } = context.params; // ✅ no warning here
-
     const updated = await Transaction.findByIdAndUpdate(id, body, { new: true });
+
+    if (!updated) {
+      return NextResponse.json({ message: "Transaction not found" }, { status: 404 });
+    }
 
     return NextResponse.json(updated);
   } catch (error) {
-    return NextResponse.json({ message: 'Error updating transaction', error }, { status: 500 });
+    console.error("Error updating transaction:", error);
+    return NextResponse.json(
+      { message: "Error updating transaction", error: (error as Error).message },
+      { status: 500 }
+    );
   }
 }
+
+
+
+
 
 
