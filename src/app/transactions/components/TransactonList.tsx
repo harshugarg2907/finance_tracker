@@ -1,13 +1,10 @@
 'use client'
 
-import { Description } from "@radix-ui/react-dialog";
 import TransactionForm from "./TransactionForm";
 import React, { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import SpinnerCircle1 from "@/components/ui/SpinnerCircle1";
-import { Table } from '@/components/ui/table';
 
 
 export default function TransactionList() {
@@ -70,17 +67,18 @@ export default function TransactionList() {
         <div>
             <TransactionForm onAdd={fetchdata} editData={editTx} clearEdit={() => setEditTx(null)} />
 
-            {loading && <div className="flex w-screen h-8 justify-center items-center ">{SpinnerCircle1()}</div>}
+            {loading && <div className="flex w-full h-2 justify-center  items-center ">{SpinnerCircle1()}</div>}
             {!loading && transactions.length === 0 && <p>No transactions found.</p>}
             {transactions.map((i) => (
                 <div key={i._id}>
                     <Card className="mb-2">
-                        <CardContent className="flex justify-between items-center p-3">
+                        <CardContent className="flex h-15 justify-between items-center p-3">
                             <div>
                                 <p className="font-medium">{i.description}</p>
                                 <p className="text-sm font-semibold text-muted-foreground">
                                     {new Date(i.date).toLocaleDateString()} – ₹{i.amount}
                                 </p>
+                                <p className="text-red-500 font-semibold">{i.category}</p>
                             </div>
                             <div className='flex gap-2'>
 
@@ -104,41 +102,8 @@ export default function TransactionList() {
       </Card> */}
 
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Card className="mt-8 w-full sm:w-1/2">
-                    <CardHeader>
-                        <CardTitle>Monthly Expenses</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={chartData}>
-                                <XAxis dataKey="month" />
-                                <YAxis />
-                                <Tooltip />
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <Bar dataKey="amount" fill="#4F46E5" />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </CardContent>
-                </Card>
+            
 
-                <Card className="mt-8 w-full sm:w-1/2">
-                    <CardHeader>
-                        <CardTitle>Daily Expenses</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <ResponsiveContainer width="100%" height={300}>
-                            <BarChart data={chartData2}>
-                                <XAxis dataKey="date" />
-                                <YAxis />
-                                <Tooltip />
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <Bar dataKey="amount" fill="#4F46E5" />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </CardContent>
-                </Card>
-            </div>
 
         </div>
 

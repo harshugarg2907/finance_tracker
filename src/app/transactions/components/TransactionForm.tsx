@@ -4,11 +4,20 @@ import React, { useState, useEffect } from "react"
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+
 
 
 export default function TransactionForm({ onAdd, editData, clearEdit }: { onAdd: () => void, editData?: any, clearEdit?: () => void }) {
 
-    const [form, setForm] = useState({ amount: '', date: '', description: '' });
+    const [form, setForm] = useState({ amount: '', date: '', description: '',  category: '',
+ });
 
     useEffect(() => {
         if (editData) {
@@ -16,6 +25,9 @@ export default function TransactionForm({ onAdd, editData, clearEdit }: { onAdd:
                 amount: editData.amount.toString(),
                 date: new Date(editData.date).toISOString().split('T')[0],
                 description: editData.description,
+                category: editData.category,
+
+
             });
         }
     }, [editData]);
@@ -25,7 +37,7 @@ export default function TransactionForm({ onAdd, editData, clearEdit }: { onAdd:
     }
 
     const handlesubmit = async (e: React.FormEvent) => {
-        e.preventDefault;
+        e.preventDefault();
         try {
             if (editData) {
                 await fetch(`/api/transactions/${editData._id}`, {
@@ -35,8 +47,10 @@ export default function TransactionForm({ onAdd, editData, clearEdit }: { onAdd:
                         amount: parseFloat(form.amount),
                         date: new Date(form.date),
                         description: form.description,
+                        category:form.category
                     }),
                 });
+                console.log(form.category);
                 clearEdit && clearEdit();
             } else {
                 await fetch('/api/transactions', {
@@ -46,11 +60,15 @@ export default function TransactionForm({ onAdd, editData, clearEdit }: { onAdd:
                         amount: parseFloat(form.amount),
                         date: new Date(form.date),
                         description: form.description,
+                        category:form.category
+
                     }),
                 });
-                setForm({ amount: '', date: '', description: '' })
-                onAdd();
+
             }
+             setForm({ amount: '', date: '', description: '',category:'' })
+             onAdd();
+
         }
         catch (error) {
             console.error('Failed to save transaction:', error);
@@ -78,6 +96,20 @@ export default function TransactionForm({ onAdd, editData, clearEdit }: { onAdd:
                         required
                         className="w-full sm:w-1/3"
                     />
+
+                    <Select value={form.category} onValueChange={(value) => setForm({ ...form, category: value })}>
+                        <SelectTrigger className="w-full sm:w-1/3">
+                            <SelectValue placeholder="Select Category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Food">Food</SelectItem>
+                            <SelectItem value="Rent">Rent</SelectItem>
+                            <SelectItem value="Travel">Travel</SelectItem>
+                            <SelectItem value="Shopping">Shopping</SelectItem>
+                            <SelectItem value="Utilities">Utilities</SelectItem>
+                            <SelectItem value="Other">Other</SelectItem>
+                        </SelectContent>
+                    </Select>
                     <Input
                         type="text"
                         name="description"
