@@ -1,39 +1,42 @@
 import { connectDB } from "@/lib/db";
 import Transaction from "@/models/Transaction";
-import { NextResponse,NextRequest } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
-
-
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
-    try {
-        await connectDB();
-        await Transaction.findByIdAndDelete(params.id);
-        return NextResponse.json({ message: 'Transaction deleted' });
-    } catch (error) {
-        return NextResponse.json({ message: 'Error deleting transaction', error }, { status: 500 });
-    }
-
-}
-
-
+// Type definition for the params
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
+export async function DELETE(
+  req: NextRequest,
+  { params }: RouteParams
+) {
+  try {
+    // Await the params promise (required in Next.js 13+ App Router)
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
+
+    await connectDB();
+    await Transaction.findByIdAndDelete(id);
+    return NextResponse.json({ message: 'Transaction deleted' });
+  } catch (error) {
+    return NextResponse.json({ message: 'Error deleting transaction', error }, { status: 500 });
+  }
+}
 
 export async function PUT(
   req: NextRequest,
   { params }: RouteParams
 ) {
-  
+  try {
+    // Await the params promise (required in Next.js 13+ App Router)
     const resolvedParams = await params;
     const id = resolvedParams.id;
 
-  if (!id) {
-    return NextResponse.json({ message: "Missing transaction ID" }, { status: 400 });
-  }
+    if (!id) {
+      return NextResponse.json({ message: "Missing transaction ID" }, { status: 400 });
+    }
 
-  try {
     await connectDB();
     const body = await req.json();
     const updated = await Transaction.findByIdAndUpdate(id, body, { new: true });
@@ -51,9 +54,3 @@ export async function PUT(
     );
   }
 }
-
-
-
-
-
-
