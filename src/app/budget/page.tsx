@@ -35,7 +35,7 @@ export default function BudgetPage() {
 
   return (
     <div className="">
-     <h1 className="text-3xl font-bold mb-4">Charts</h1> 
+     <h1 className="text-3xl font-bold mb-4">Budget Insights</h1> 
       <BudgetForm onAdd={fetchData} />
 
       <div className="mt-6">
